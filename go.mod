@@ -1,4 +1,4 @@
-module github.com/hexdigest/envconfig
+module github.com/ypopivniak-cg/envconfig
 
 go 1.16
 

@@ -48,6 +48,17 @@ func (e *ParseError) Error() string {
 	return fmt.Sprintf("envconfig.Process: assigning %[1]s to %[2]s: converting '%[3]s' to type %[4]s. details: %[5]s", e.KeyName, e.FieldName, e.Value, e.TypeName, e.Err)
 }
 
+// A RequiredFieldError occurs when a required environment variable is missing
+type RequiredFieldError struct {
+	Key  string
+	Alt  string
+	Name string
+}
+
+func (e *RequiredFieldError) Error() string {
+	return fmt.Sprintf("envconfig.Process: required key %s missing value for field %s", e.Key, e.Name)
+}
+
 // varInfo maintains information about the configuration variable
 type varInfo struct {
 	Name  string
@@ -203,11 +214,11 @@ func Process(prefix string, spec interface{}) error {
 		req := info.Tags.Get("required")
 		if !ok && def == "" {
 			if isTrue(req) {
-				key := info.Key
-				if info.Alt != "" {
-					key = info.Alt
+				return &RequiredFieldError{
+					Key:  info.Key,
+					Alt:  info.Alt,
+					Name: info.Name,
 				}
-				return fmt.Errorf("required key %s missing value", key)
 			}
 			continue
 		}
