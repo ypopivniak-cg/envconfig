@@ -254,6 +254,9 @@ func removeEmptyStructs(spec interface{}) error {
 
 		switch f.Kind() {
 		case reflect.Struct:
+			if !f.CanSet() {
+				continue
+			}
 			if err := removeEmptyStructs(f.Addr().Interface()); err != nil {
 				return err
 			}
