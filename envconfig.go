@@ -82,6 +82,7 @@ func gatherInfo(prefix string, spec interface{}) ([]varInfo, error) {
 	typeOfSpec := s.Type()
 
 	// over allocate an info array, we will extend if needed later
+	seen := make(map[string]struct{}, s.NumField())
 	infos := make([]varInfo, 0, s.NumField())
 	for i := 0; i < s.NumField(); i++ {
 		f := s.Field(i)
@@ -136,6 +137,10 @@ func gatherInfo(prefix string, spec interface{}) ([]varInfo, error) {
 			info.Key = fmt.Sprintf("%s_%s", prefix, info.Key)
 		}
 		info.Key = strings.ToUpper(info.Key)
+		if _, ok := seen[info.Key]; ok {
+			continue
+		}
+		seen[info.Key] = struct{}{}
 		infos = append(infos, info)
 
 		if f.Kind() == reflect.Struct {
